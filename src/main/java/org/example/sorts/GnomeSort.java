@@ -11,9 +11,7 @@ public class GnomeSort<T extends Comparable<T>> implements SortAlgorithm<T> {
         while (index < list.size()) {
             if (index == 0) {
                 index++;
-            }
-
-            if (list.get(index).compareTo(list.get(index - 1)) >= 0) {
+            } else if (list.get(index).compareTo(list.get(index - 1)) >= 0) {
                 index++;
             } else {
                 T temp = list.get(index);

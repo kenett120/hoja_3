@@ -5,6 +5,10 @@ import java.util.List;
 public class RadixSort {
 
     public void sort(List<Integer> list) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+
         int max = getMax(list);
 
         for (int exp = 1; max / exp > 0; exp *= 10) {
