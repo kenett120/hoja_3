@@ -37,3 +37,11 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Generated benchmark files ###
+benchmark-profile.jfr
+jfr_execution_samples.txt
+benchmark_output.txt
+numbers.txt
+performance_graph.png
+theoretical_complexity.png
