@@ -17,15 +17,19 @@ import java.util.concurrent.*;
  * para los diferentes algoritmos de ordenamiento.
  *
  * Esta clase:
- * - Genera datos aleatorios.
- * - Guarda y lee datos desde archivo.
- * - Ejecuta los algoritmos en escenarios desordenados (caso promedio)
- *   y ordenados (mejor caso).
- * - Mide el tiempo de ejecución utilizando System.nanoTime().
+ * - Genera números aleatorios.
+ * - Guarda y lee los datos desde archivo.
+ * - Ejecuta los algoritmos en dos escenarios:
+ *      • Datos desordenados (caso promedio)
+ *      • Datos ordenados (mejor caso)
+ * - Mide el tiempo de ejecución usando System.nanoTime().
  * - Guarda los resultados en un archivo CSV.
  *
- * Las pruebas se ejecutan en paralelo mediante ExecutorService
- * para optimizar el tiempo total de benchmark.
+ * Las ejecuciones se realizan en paralelo utilizando
+ * ExecutorService para optimizar el tiempo total del benchmark.
+ *
+ * Los tamaños evaluados van desde 10 hasta 3000 elementos,
+ * conforme a lo solicitado en la hoja de trabajo.
  *
  * @author Joao
  * @version 1.0
@@ -40,7 +44,7 @@ public class SortBenchMark {
 
     /**
      * Constructor que inicializa el archivo CSV y escribe
-     * el encabezado de columnas.
+     * el encabezado correspondiente.
      *
      * @throws IOException si ocurre un error al crear el archivo
      */
@@ -50,9 +54,8 @@ public class SortBenchMark {
     }
 
     /**
-     * Ejecuta los benchmarks para diferentes tamaños de datos,
-     * evaluando tanto el caso promedio (datos desordenados)
-     * como el mejor caso (datos ya ordenados).
+     * Ejecuta los benchmarks para distintos tamaños de datos,
+     * evaluando tanto el caso promedio como el mejor caso.
      *
      * @throws Exception si ocurre algún error durante la ejecución
      */
@@ -60,22 +63,26 @@ public class SortBenchMark {
         RandomNumberGeneration generator = new RandomNumberGeneration();
         FileManager fileManager = new FileManager();
 
-        System.out.println("Running benchmarks from 10 to 100,000 elements...\n");
+        System.out.println("Running benchmarks from 10 to 3000 elements...\n");
 
-        int[] sizes = {10, 100, 1_000, 5_000, 10_000, 30_000, 50_000, 100_000};
+        // Tamaños ajustados según la hoja (máximo 3000)
+        int[] sizes = {10, 100, 500, 1000, 2000, 3000};
 
         ExecutorService executor = Executors.newFixedThreadPool(10);
 
         for (int size : sizes) {
             System.out.println("Testing with " + size + " elements:");
 
+            // Generar datos aleatorios
             List<Integer> data = generator.generateNumbers(size);
             fileManager.writeNumbersToFile(data);
             List<Integer> unsortedNumbers = fileManager.readNumbersFromFile();
 
+            // Crear copia ordenada (mejor caso)
             List<Integer> sortedNumbers = new ArrayList<>(unsortedNumbers);
             Collections.sort(sortedNumbers);
 
+            // Caso promedio (datos desordenados)
             System.out.println("  Unsorted data (Average Case):");
             List<Future<BenchmarkResult>> unsortedFutures = new ArrayList<>();
 
@@ -96,6 +103,7 @@ public class SortBenchMark {
                 csvWriter.write(result.name + "," + result.size + "," + result.scenario + "," + result.timeMs + "\n");
             }
 
+            // Mejor caso (datos ordenados)
             System.out.println("  Sorted data (Best Case):");
             List<Future<BenchmarkResult>> sortedFutures = new ArrayList<>();
 
@@ -128,6 +136,14 @@ public class SortBenchMark {
     /**
      * Mide el tiempo de ejecución de un algoritmo
      * basado en comparación.
+     *
+     * @param name nombre del algoritmo
+     * @param algorithm instancia del algoritmo
+     * @param data datos a ordenar
+     * @param size tamaño del conjunto de datos
+     * @param scenario escenario evaluado (Sorted o Unsorted)
+     * @param <T> tipo de dato comparable
+     * @return resultado encapsulado del benchmark
      */
     private <T extends Comparable<T>> BenchmarkResult measureParallel(
             String name,
@@ -146,6 +162,12 @@ public class SortBenchMark {
 
     /**
      * Mide el tiempo de ejecución del algoritmo Radix Sort.
+     *
+     * @param name nombre del algoritmo
+     * @param data datos a ordenar
+     * @param size tamaño del conjunto de datos
+     * @param scenario escenario evaluado
+     * @return resultado encapsulado del benchmark
      */
     private BenchmarkResult measureRadixParallel(
             String name,
